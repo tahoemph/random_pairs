@@ -10,7 +10,7 @@ three programs to make that easier:
 2) test\_pairs
 3) make\_pairs
 
-The idea is that create\_pairs emits a set of unique pairs using history as a CSV.
+The idea is that create\_pairs emits a set of unique pairs (using history) as a CSV.
 test\_pairs test to see if the set of pairs is unique.  This allows the CSV to be
 hand modified and then tested.  make\_pairs writes the history of the pair set chosen.
 
