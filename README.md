@@ -21,7 +21,8 @@ The sqlite database is made up of two tables.
 
 The first table is a set of users.  This table
 has the schema of a column of string which represent the names and a column of boolean which
-represent if that person is still active in the pairing.
+represent if that person is still active in the pairing.  There is an additional location
+attribute which is intended to be used to partition the set for pairing.
 
 The second table are all the pairs that have been used to this point in two columns with the
 first column containing the name which is lexicographically less than the second name.

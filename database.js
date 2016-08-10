@@ -14,39 +14,46 @@ var findDatabase = function() {
     return database;
 };
 
-var writePairs = function(database, pairs) {
-    var Users = database.define('user', {
-        name: {
-            type: sequelize.STRING,
-            field: 'name'
-        },
-        active: {
-            type: sequelize.BOOLEAN,
-            field: 'active'
-        }
-    }, {
-        freezeTableName: true
-    });
+var Users = null;
+var Pairs = null;
 
-    var Pairs = database.define('pairs', {
-        name1: {
-            type: sequelize.STRING,
-            field: 'name1'
-        },
-        name2: {
-            type: sequelize.STRING,
-            field: 'name2'
-        }
-    }, {
-        freezeTableName: true
-    });
+var _defineDatabase = function(database) {
+    if (!Pairs) {
+        Pairs = database.define('pairs', {
+            name1: sequelize.STRING,
+            name2: sequelize.STRING,
+        }, {
+            freezeTableName: true
+        });
+    }
 
-    Users.sync({force: false}).then(function() {
-        return Users.create(pairs);
+    if (!Users) {
+        Users = database.define('user', {
+            name: sequelize.STRING,
+            location: sequelize.STRING,
+            active: sequelize.BOOLEAN,
+        }, {
+            freezeTableName: true
+        });
+    }
+};
+
+var writePair = function(pair) {
+    _defineDatabase(findDatabase());
+    Pairs.sync().then(function() {
+        return Pairs.create(pair);
+    });
+};
+
+var writeUser = function(user) {
+    _defineDatabase(findDatabase());
+    Users.sync().then(function() {
+        return Users.create(user);
     });
 };
 
 
 
 exports.findDatabase = findDatabase;
-exports.writePairs = writePairs;
+exports.writePair = writePair;
+exports.writeUser = writeUser;
