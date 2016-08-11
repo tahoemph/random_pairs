@@ -20,18 +20,6 @@ function shuffleArray(arr) {
     return arr;
 }
 
-function orderPair(pair) {
-    var name1, name2, nameTemp;
-    name1 = pair[0];
-    name2 = pair[1];
-    if (name2 < name1) {
-        nameTemp = name1;
-        name1 = name2;
-        name2 = nameTemp;
-    }
-    return [name1, name2];
-}
-
 var pairs;
 
 function testUniqueness(pair) {
@@ -120,7 +108,7 @@ database.readPairs().then(function(userPairs) {
                 }
                 value = usersByLocation[key];
                 for (i = 0; i < value.length; i += 2) {
-                    pair = orderPair([value[i], value[i+1]]);
+                    pair = database.orderPair([value[i], value[i+1]]);
                     if (!testUniqueness(pair)) {
                         notUnique = true;
                     }
@@ -131,7 +119,7 @@ database.readPairs().then(function(userPairs) {
             key = keys[i];
             value = usersByLocation[key];
             for (var j = 0; j < value.length; j += 2) {
-                pair = orderPair([value[j], value[j+1]]);
+                pair = database.orderPair([value[j], value[j+1]]);
                 console.log(pair);
                 csvStream.write({Name: pair[0], Buddy: pair[1]});
             }
