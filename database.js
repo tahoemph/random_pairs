@@ -45,6 +45,13 @@ var writePair = function(pair) {
     });
 };
 
+var readPair = function(pair) {
+    _defineDatabase(findDatabase());
+    return Pairs.findAll({
+        where: pair
+    });
+};
+
 var writeUser = function(user) {
     _defineDatabase(findDatabase());
     Users.sync().then(function() {
@@ -52,8 +59,13 @@ var writeUser = function(user) {
     });
 };
 
+var readUser = function() {
+    throw new Error("not implemented");
+};
 
 
 exports.findDatabase = findDatabase;
 exports.writePair = writePair;
+exports.readPair = readPair;
 exports.writeUser = writeUser;
+exports.readUser = readUser;

@@ -6,12 +6,21 @@ var csv = require('fast-csv');
 var database = require('./database');
 
 var db = database.findDatabase();
-var pairs = [];
-var data = csv.fromPath('pairs.csv').
+var data = csv.fromPath('pairs.csv', {headers: true}).
 on("data", function(datum) {
     console.log(datum);
-    pairs.push({name1: datum[0], name2: datum[1]});
-}).
-on('end', function() {
-    database.writePairs(db, pairs[0]);
+    var name1 = datum.Name;
+    var name2 = datum.Buddy;
+    if (name2 > name1) {
+        var nameTemp = name1;
+        name1 = name2;
+        name2 = nameTemp;
+    }
+    var pair = {name1: name1, name2: name2};
+    // Should throw an error here or log?
+    database.readPair(pair).then(function(rows) {
+        if (rows.length === 0) {
+            database.writePair({name1: name1, name2: name2});
+        }
+    });
 });
