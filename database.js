@@ -52,6 +52,11 @@ var readPair = function(pair) {
     });
 };
 
+var readPairs = function() {
+    _defineDatabase(findDatabase());
+    return Pairs.findAll();
+};
+
 var writeUser = function(user) {
     _defineDatabase(findDatabase());
     Users.sync().then(function() {
@@ -63,9 +68,20 @@ var readUser = function() {
     throw new Error("not implemented");
 };
 
+var readUsers = function() {
+    _defineDatabase(findDatabase());
+    return Users.findAll({
+        where: {
+            active: 1
+        }
+    });
+};
+
 
 exports.findDatabase = findDatabase;
 exports.writePair = writePair;
-exports.readPair = readPair;
 exports.writeUser = writeUser;
+exports.readPair = readPair;
+exports.readPairs = readPairs;
 exports.readUser = readUser;
+exports.readUsers = readUsers;
