@@ -38,6 +38,18 @@ var _defineDatabase = function(database) {
     }
 };
 
+var orderPair function(pair) {
+    var name1, name2, nameTemp;
+    name1 = pair[0];
+    name2 = pair[1];
+    if (name2 < name1) {
+        nameTemp = name1;
+        name1 = name2;
+        name2 = nameTemp;
+    }
+    return [name1, name2];
+}
+
 var writePair = function(pair) {
     _defineDatabase(findDatabase());
     Pairs.sync().then(function() {
@@ -83,5 +95,6 @@ exports.writePair = writePair;
 exports.writeUser = writeUser;
 exports.readPair = readPair;
 exports.readPairs = readPairs;
+exports.orderPair = orderPair;
 exports.readUser = readUser;
 exports.readUsers = readUsers;
