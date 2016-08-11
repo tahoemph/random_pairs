@@ -21,6 +21,8 @@ on("data", function(datum) {
     database.readPair(pair).then(function(rows) {
         if (rows.length === 0) {
             database.writePair({name1: name1, name2: name2});
+        } else {
+            console.log("dup pair: " + name1 + " " + name2);
         }
     });
 });
