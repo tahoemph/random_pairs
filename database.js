@@ -71,13 +71,42 @@ var readPairs = function() {
 
 var writeUser = function(user) {
     _defineDatabase(findDatabase());
-    Users.sync().then(function() {
-        return Users.create(user);
+    Users.findAll({
+        where: {
+            name: user.name
+        }
+    }).then(function(users) {
+        if (users.length == 1) {
+            return Users.update(
+                {
+                    active: user.active,
+                    name: user.name,
+                    location: user.location
+                },
+                {
+                    where: {
+                        name: user.name
+                    }
+                }
+            );
+        } else if (users.length === 0) {
+            Users.sync().then(function() {
+                return Users.create(user);
+            });
+        } else {
+            console.log("found multiple users for " + user.name);
+            process.exit(-1);
+        }
     });
 };
 
-var readUser = function() {
-    throw new Error("not implemented");
+var findUserByName = function(userName) {
+    _defineDatabase(findDatabase());
+    return Users.findAll({
+        where: {
+            name: userName
+        }
+    });
 };
 
 var readUsers = function() {
@@ -96,5 +125,5 @@ exports.writeUser = writeUser;
 exports.readPair = readPair;
 exports.readPairs = readPairs;
 exports.orderPair = orderPair;
-exports.readUser = readUser;
+exports.findUserByName = findUserByName;
 exports.readUsers = readUsers;
