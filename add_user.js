@@ -1,4 +1,4 @@
-// This takes in a set of pairs and writes them to the database.
+// This takes in a users and write it to the database.
 /*jshint node: true */
 "use strict";
 
