@@ -32,6 +32,7 @@ var _defineDatabase = function(database) {
             name: sequelize.STRING,
             location: sequelize.STRING,
             active: sequelize.BOOLEAN,
+            department: sequelize.STRING,
         }, {
             freezeTableName: true
         });

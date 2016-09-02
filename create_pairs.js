@@ -27,10 +27,10 @@ function testUniqueness(pair) {
     // This could be replaced with something better.
     for (var i = 0; i < pairs.length; i++) {
         // If we have advanced past the point this pair could exist then terminate search.
-        if (pair[0] > pairs[i].name1 && pair[1] > pairs[i].name2) {
+        if (pair[0] < pairs[i][0] && pair[1] < pairs[i][1]) {
             return true;
         }
-        if (pair[0] === pairs[i].name1 && pair[1] === pairs[i].name2) {
+        if (pair[0] === pairs[i][0] && pair[1] === pairs[i][1]) {
             console.log("found " + pair[0] + " " + pair[1]);
             return false;
         }
@@ -39,22 +39,38 @@ function testUniqueness(pair) {
 }
 
 database.readPairs().then(function(userPairs) {
-    pairs = userPairs.sort(function(a, b) {
-        if (a.name1 === b.name1) {
-            return (a.name2 < b.name2);
+    function strCmp(a, b) {
+        if (a == b) {
+            return (0);
+        } else if (a > b) {
+            return (1);
         } else {
-            return (a.name1 < b.name1);
+            return (-1);
         }
+    }
+
+    pairs = userPairs.map(function(a) {
+        return database.orderPair([a.name1, a.name2]);
+    }).sort(function(a, b) {
+        var val = strCmp(a[0], b[0]);
+        if (val != 0) {
+            return val;
+        }
+        return strCmp(a[1], b[1]);
     });
 
     database.readUsers().then(function(users) {
         // Partition users into sets by Location.
         var usersByLocation = new Map();
+        var departmentByUser = new Map();
         users.map(function(elem) {
             if (!(elem.location in usersByLocation)) {
                 usersByLocation[elem.location] = [];
             }
             usersByLocation[elem.location].push(elem.name);
+        });
+        users.map(function(elem) {
+            departmentByUser[elem.name] = elem.department;
         });
         // Balance locations.
         // If a location is less then 10 individuals put it into global
@@ -88,36 +104,75 @@ database.readPairs().then(function(userPairs) {
             usersByLocation.global = globalPool;
         }
 
-        var notUnique = true;
+        var options = [];
+        var notUnique;
         var pair;
-        while(notUnique) {
-            keys = Object.keys(usersByLocation);
-            for (i = 0; i < keys.length; i++) {
-                key = keys[i];
-                if (!usersByLocation.hasOwnProperty(key)) {
-                    continue;
+        for (var tries = 0; tries < 100; tries++) {
+            notUnique = true;
+            while(notUnique) {
+                keys = Object.keys(usersByLocation);
+                for (i = 0; i < keys.length; i++) {
+                    key = keys[i];
+                    if (!usersByLocation.hasOwnProperty(key)) {
+                        continue;
+                    }
+                    value = usersByLocation[key];
+                    shuffleArray(value);
                 }
-                value = usersByLocation[key];
-                shuffleArray(value);
-            }
-            notUnique = false;
-            for (i = 0; i < keys.length; i++) {
-                key = keys[i];
-                if (!usersByLocation.hasOwnProperty(key)) {
-                    continue;
-                }
-                value = usersByLocation[key];
-                for (i = 0; i < value.length; i += 2) {
-                    pair = database.orderPair([value[i], value[i+1]]);
-                    if (!testUniqueness(pair)) {
-                        notUnique = true;
+                notUnique = false;
+                for (i = 0; i < keys.length; i++) {
+                    key = keys[i];
+                    if (!usersByLocation.hasOwnProperty(key)) {
+                        continue;
+                    }
+                    value = usersByLocation[key];
+                    for (i = 0; i < value.length; i += 2) {
+                        pair = database.orderPair([value[i], value[i+1]]);
+                        if (!testUniqueness(pair)) {
+                            notUnique = true;
+                        }
                     }
                 }
             }
+            var possibility = {};
+            for (i = 0; i < keys.length; i++) {
+                key = keys[i];
+                if (usersByLocation.hasOwnProperty(key)) {
+                    possibility[key] = usersByLocation[key].slice(0);
+                }
+            }
+            options.push(possibility);
         }
+
+        function scorePairing(possibility) {
+            var score = 0;
+            for (var i = 0; i < keys.length; i++) {
+                key = keys[i];
+                value = possibility[key];
+                for (var j = 0; j < value.length; j += 2) {
+                    if (departmentByUser[value[j]] != departmentByUser[value[j+1]]) {
+                        score += 1;
+                    }
+                }
+            }
+            return score;
+        }
+
+        var maxScore = 0;
+        var maxInd = 0;
+        var score;
+        for (i = 0; i < options.length; i++) {
+            score = scorePairing(options[i]);
+            if (score > maxScore) {
+                maxScore = score;
+                maxInd = i;
+            }
+        }
+
+        var option = options[maxInd];
         for (i = 0; i < keys.length; i++) {
             key = keys[i];
-            value = usersByLocation[key];
+            value = option[key];
             for (var j = 0; j < value.length; j += 2) {
                 pair = database.orderPair([value[j], value[j+1]]);
                 console.log(pair);
