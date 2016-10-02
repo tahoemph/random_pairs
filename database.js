@@ -72,7 +72,7 @@ var readPairs = function() {
 
 var writeUser = function(user) {
     _defineDatabase(findDatabase());
-    Users.findAll({
+    return Users.findAll({
         where: {
             name: user.name
         }

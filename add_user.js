@@ -4,4 +4,4 @@
 
 var database = require('./database');
 
-database.writeUser({name: process.argv[2], location: process.argv[3], active: true});
+database.writeUser({name: process.argv[2], location: process.argv[3], department: process.argv[4], active: true});
