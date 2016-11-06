@@ -169,15 +169,21 @@ database.readPairs().then(function(userPairs) {
         }
 
         var option = options[maxInd];
+        pairs = []
         for (i = 0; i < keys.length; i++) {
             key = keys[i];
             value = option[key];
             for (var j = 0; j < value.length; j += 2) {
-                pair = database.orderPair([value[j], value[j+1]]);
-                console.log(pair);
-                csvStream.write({Name: pair[0], Buddy: pair[1]});
+                pairs.push(database.orderPair([value[j], value[j+1]]));
             }
         }
+        pairs.sort();
+        for (var i = 0; i < pairs.length; i++) {
+            pair = pairs[i]
+            console.log(pair[0] + "\t" + pair[1]);
+            csvStream.write({Name: pair[0], Buddy: pair[1]});
+        }
+
         csvStream.end();
     });
 });
