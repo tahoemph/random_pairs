@@ -31,7 +31,6 @@ function testUniqueness(pair) {
             return true;
         }
         if (pair[0] === pairs[i][0] && pair[1] === pairs[i][1]) {
-            console.log("found " + pair[0] + " " + pair[1]);
             return false;
         }
     }
